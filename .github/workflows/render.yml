@@ -1,0 +1,35 @@
+name: render
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Render frames
+        run: node render.mjs
+      - name: Encode MP4
+        run: |
+          mkdir -p out
+          ffmpeg -y -framerate 24 -i frames/%04d.jpg -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -movflags +faststart out/pelican-bike.mp4
+          ls -lh out/pelican-bike.mp4
+      - name: Publish release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: Pelican Bike Code Video
+          files: out/pelican-bike.mp4
