@@ -48,6 +48,17 @@ function buildPlanks() {
   }
 }
 
+function findNearWing() {
+  var ps = document.querySelectorAll('#pelicanAll path');
+  for (var i = 0; i < ps.length; i++) {
+    var d = ps[i].getAttribute('d') || '';
+    if (d.indexOf('M500 902') === 0 && !ps[i].getAttribute('filter')) {
+      ps[i].setAttribute('id', 'nearWing');
+      return;
+    }
+  }
+}
+
 function ik(h, a, l1, l2, bend) {
   var dx = a.x - h.x;
   var dy = a.y - h.y;
@@ -103,7 +114,7 @@ function draw(t) {
 
   var bob = 5.2 * Math.sin(theta * 2);
   $('pelicanAll').setAttribute('transform', 'translate(0 ' + bob.toFixed(2) + ')');
-  $('nearWing').setAttribute('transform', 'rotate(' + (-2 + 2.4 * Math.sin(theta * 2 + 0.2)).toFixed(2) + ' 500 905)');
+  if ($('nearWing')) $('nearWing').setAttribute('transform', 'rotate(' + (-2 + 2.4 * Math.sin(theta * 2 + 0.2)).toFixed(2) + ' 500 905)');
   $('headGroup').setAttribute('transform', 'rotate(' + (1.4 * Math.sin(theta * 2 + 0.4)).toFixed(2) + ' 620 800)');
   $('shadowGroup').setAttribute('transform', 'translate(' + (2 * Math.sin(theta * 2)).toFixed(2) + ' ' + (bob * 0.22).toFixed(2) + ')');
 
@@ -119,6 +130,7 @@ function draw(t) {
   setFoot('footFar', ankleFar);
 }
 
+findNearWing();
 buildSpokes('spokesRear', 350, 1470, 136, 20);
 buildSpokes('spokesFront', 760, 1470, 136, 20);
 buildRailing();
